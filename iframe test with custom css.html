@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<title>CardConnect Example Page of the Hosted AJAX Tokenizer</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="title" content="" />
+	<meta name="description" content="" />
+	<meta name="keywords" content="" />
+	<meta name="robots" content="noindex, nofollow" />
+
+	<script language="JavaScript">
+		var tokenProperty;
+
+		var sitevar = 'fts-uat';
+
+		function showMe() {
+			var mytoken = document.getElementById('mytoken');
+			var myexpiry = document.getElementById('myexpiry');
+			alert("Token=" + mytoken.value + " Expiry=" + myexpiry.value);
+		}
+
+		window.addEventListener('message', function(event) {
+			console.log(event.data);
+			var token = JSON.parse(event.data);
+			console.log('Received message ' + event.data);
+			var mytoken = document.getElementById('mytoken');
+			var myexpiry = document.getElementById('myexpiry');
+
+			mytoken.value = token[tokenProperty];
+			myexpiry.value = token["expiry"];
+		}, false);
+
+
+		function onLoad() {
+			var queryString = "sendcssloadedevent=true&useexpiry=true&usecvv=true&invalidinputevent=true&tokenizewheninactive=true&cvvnumericonly=false&css=label%20%7B%20font-family%3A%20Helvetica%2C%20sans-serif%3B%20font-size%3A%2013px%3B%20font-weight%3A%20normal%20%7D%0Ainput%2C%20select%20%7B%20font-family%3A%20Helvetica%2C%20sans-serif%3B%20font-size%3A%2013px%3B%20background-color%3A%20%23FFFFFF%3B%20border%3A%201px%20solid%20%23CCCCCC%3B%20border-radius%3A%202px%3B%20-webkit-appearance%3A%20none%3B%20margin%3A%200%20%7D%0A%23ccnumfield%20%7B%20width%3A%20274px%3B%20padding%3A%204px%3B%20%7D%0A%23ccexpirymonth%20%7B%20width%3A%2070px%3B%20padding%3A%204px%3B%20%7D%0A%23ccexpiryyear%20%7B%20width%3A%2070px%3B%20padding%3A%204px%3B%20%7D%0A%23cccvvfield%20%7B%20width%3A%2060px%3B%20padding%3A%204px%3B%20%7D";
+			document.getElementById("tokenframe").src = "https://" + sitevar + ".cardconnect.com/itoke/ajax-tokenizer.html?" + queryString;
+			tokenProperty = scrubInput(getQueryVariable("tokenpropname", "message"), 30, "message", /^[0-9a-zA-Z]+$/);
+		}
+
+		function getQueryVariable(variable, defaultValue) {
+			var query = window.location.search.substring(1);
+			var vars = query.split("&");
+			for (var i = 0; i < vars.length; i++) {
+				var pair = vars[i].split("=");
+				if (pair[0] == variable) {
+					return pair[1];
+				}
+			}
+			return defaultValue ? defaultValue : (false);
+		}
+
+		function scrubInput(input, maxlen, fallback, pattern) {
+			if (input && input.length !== 0 && input.length <= maxlen) {
+				if (input.match(pattern)) {
+					return input;
+				}
+			}
+			return fallback;
+		}
+	</script>
+	<!--
+	label { font-family: Helvetica, sans-serif; font-size: 13px; font-weight: normal }
+	input, select { font-family: Helvetica, sans-serif; font-size: 13px; background-color: #FFFFFF; border: 1px solid #CCCCCC; border-radius: 2px; -webkit-appearance: none; margin: 0 }
+	#ccnumfield { width: 274px; padding: 4px; }
+	#ccexpirymonth { width: 70px; padding: 4px; }
+	#ccexpiryyear { width: 70px; padding: 4px; }
+	#cccvvfield { width: 60px; padding: 4px; }
+	 -->
+</head>
+
+<body onload="onLoad()">
+
+<B>	Hosted AJAX iFrame Tokenizer Example</b><br>
+	<a href="https://developer.cardconnect.com/hosted-iframe-tokenizer">https://developer.cardconnect.com/hosted-iframe-tokenizer</a>
+	This page shows how to use the Hosted iFrame tokenizer. View page source to see the iFrame tag reference.<br />
+	After the credit card number is entered by the user, the iFrame returns the token to this outer page. This page<br />
+	displays pop-up dialog showing the token provided by the iFrame.<br />
+	<br />
+	Please note: Although this example points to directly to an iframe HTML file only, in actual<br />
+	implementation the src attribute must point to the same file but also include the hosted URL location.<br />
+	<br />
+	<i>Example: src="fts.cardconnect.com/itoke/ajax-tokenizer.html"</i><br />
+	<br />
+
+	<br/>
+
+	<form name="order" method="post">
+		<iframe id="tokenframe" name="tokenframe" frameborder="0" scrolling="no" width="700" height="200"></iframe>
+		<br />
+		<input type="hidden" name="mytoken" id="mytoken">
+		<input type="hidden" name="myexpiry" id="myexpiry">
+		The Show Token button below demonstrates the token passed from the inner iFrame is now stored on this page and can be included as part of the payment authorization submission.<br />
+		<input type="button" value="Show Token" onClick="javascript:showMe();"><br />
+	</form>
+
+</body>
+
+</html>
